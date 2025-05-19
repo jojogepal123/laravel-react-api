@@ -30,7 +30,7 @@ class ApiServiceController extends Controller
             'truecallerData' => null,
             'allMobileData' => null,
             'socialMediaData' => null,
-            'skypeData' => null,  // New Skype API Data
+            // 'skypeData' => null,  // New Skype API Data
             'osintData' => null,
             // 'surepassKyc' => null, // Surepass KYC API
             // 'surepassUpi' => null, // Surepass UPI API
@@ -38,19 +38,19 @@ class ApiServiceController extends Controller
             'errors' => [],
         ];
         // 🔹 Fetch SkypeSearch Data
-        try {
-            $skypeResponse = Http::post('http://127.0.0.1:8080/search/skype/', [
-                'query' => $localPhoneNumber
-            ]);
+        // try {
+        //     $skypeResponse = Http::post('http://127.0.0.1:8080/search/skype/', [
+        //         'query' => $localPhoneNumber
+        //     ]);
 
-            if ($skypeResponse->successful()) {
-                $data['skypeData'] = $skypeResponse->json();
-            } else {
-                $data['errors']['skype'] = "Skype API Error: HTTP Status {$skypeResponse->status()}";
-            }
-        } catch (\Exception $e) {
-            $data['errors']['skype'] = "Skype API Exception: " . $e->getMessage();
-        }
+        //     if ($skypeResponse->successful()) {
+        //         $data['skypeData'] = $skypeResponse->json();
+        //     } else {
+        //         $data['errors']['skype'] = "Skype API Error: HTTP Status {$skypeResponse->status()}";
+        //     }
+        // } catch (\Exception $e) {
+        //     $data['errors']['skype'] = "Skype API Exception: " . $e->getMessage();
+        // }
         // Fetch Osint data
         try {
             $osintResponse = Http::withHeaders([
@@ -207,51 +207,6 @@ class ApiServiceController extends Controller
         return response()->json($data);
     }
 
-
-    public function searchSkype(Request $request)
-    {
-        // Validate request
-        $request->validate([
-            'query' => 'required|string',
-        ]);
-
-        // FastAPI URL
-        $fastApiUrl = "http://127.0.0.1:8080/search/";
-
-        // Send request to FastAPI
-        $response = Http::post($fastApiUrl, [
-            'query' => $request->query
-        ]);
-
-        // Check for errors
-        if ($response->failed()) {
-            return response()->json(['error' => 'Failed to fetch data from FastAPI'], 500);
-        }
-
-        // Return the response from FastAPI
-        return response()->json($response->json());
-    }
-    public function fetchHibpData($email)
-    {
-        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            return response()->json(['error' => 'Invalid email address'], 400);
-        }
-
-        try {
-            $client = new Client(['timeout' => 10]);
-            $response = $client->request('GET', "https://haveibeenpwned.com/api/v3/breachedaccount/{$email}", [
-                'headers' => [
-                    'hibp-api-key' => env('HIBP_API_KEY'),
-                    'User-Agent' => 'LaravelApp/1.0'
-                ]
-            ]);
-            return response()->json(json_decode($response->getBody(), true));
-        } catch (RequestException $e) {
-            Log::error("HIBP API failed: " . $e->getMessage());
-            return response()->json(['error' => 'Failed to fetch data'], 500);
-        }
-    }
-
     public function getEmailData($email)
     {
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
@@ -261,25 +216,25 @@ class ApiServiceController extends Controller
         $responses = [
             'emailData' => null,
             'hibpData' => null,
-            'skypeData' => null,  // New Skype API Data
+            // 'skypeData' => null,  // New Skype API Data
             'zehefData' => null,
             'osintData' => null,
             'errors' => []
         ];
         // 🔹 Fetch SkypeSearch Data
-        try {
-            $skypeResponse = Http::post('http://127.0.0.1:8080/search/skype/', [
-                'query' => $email
-            ]);
+        // try {
+        //     $skypeResponse = Http::post('http://127.0.0.1:8080/search/skype/', [
+        //         'query' => $email
+        //     ]);
 
-            if ($skypeResponse->successful()) {
-                $responses['skypeData'] = $skypeResponse->json();
-            } else {
-                $responses['errors'][] = "Skype API Error: HTTP Status {$skypeResponse->status()}";
-            }
-        } catch (\Exception $e) {
-            $responses['errors'][] = "Skype API Exception: " . $e->getMessage();
-        }
+        //     if ($skypeResponse->successful()) {
+        //         $responses['skypeData'] = $skypeResponse->json();
+        //     } else {
+        //         $responses['errors'][] = "Skype API Error: HTTP Status {$skypeResponse->status()}";
+        //     }
+        // } catch (\Exception $e) {
+        //     $responses['errors'][] = "Skype API Exception: " . $e->getMessage();
+        // }
 
         // 🔹 Fetch Osint Data
         try {
